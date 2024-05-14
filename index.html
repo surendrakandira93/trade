@@ -3,16 +3,33 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Intra Day</title>
+    <title>Intraday Trades</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" />
     <link rel="stylesheet" href="custom.css" />
 </head>
 <body>
+    <nav class="navbar navbar-expand-sm bg-light">
+        <!-- Links -->
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link " href="index.html">Intraday</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Option.html">Option</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="MultiDay.html">MultiDay</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Postional.html">Postional</a>
+            </li>
+        </ul>
+    </nav>
     <div class="container">
         <header class="text-center">
-            <h4>Intra Day</h4>
+            <h4>Intraday Trades</h4>
         </header>
 
         <div class="card rounded shadow border-0">
@@ -56,7 +73,7 @@
         $(document).ready(function () {
             $.ajax({
                 type: "GET",
-                url: `https://raw.githubusercontent.com/surendrakandira93/trade/main/Multiday.json?v=${(new Date()).toLocaleDateString()}`,
+                url: `https://raw.githubusercontent.com/surendrakandira93/trade/main/Intraday.json?v=${(new Date()).toLocaleDateString()}`,
                 dataType: "json",
                 success: function (response) {
                     $('#tbl_multiday').DataTable({
