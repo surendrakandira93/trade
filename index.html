@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Intra Day</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" href="custom.css" />
+</head>
+<body>
+    <div class="container">
+        <header class="text-center">
+            <h4>Intra Day</h4>
+        </header>
+
+        <div class="card rounded shadow border-0">
+            <div class="card-body p-5 bg-white rounded">
+                <div class="table-responsive">
+                    <table id="tbl_multiday" style="width:100%" class="table table-striped table-bordered">
+                        <thead class="m-datatable__head">
+                            <tr class="m-datatable__row" style="left: -722px;">
+                                <th>STRATEGY</th>
+                                <th>TIMEPLAY</th>
+                                <th>SYMBOL</th>
+                                <th>RECENT VALUE</th>
+                                <th>ALERT</th>
+                                <th>SIGNAL DT</th>
+                                <th>STATUS</th>
+                                <th>ENTRY</th>
+                                <th>T1</th>
+                                <th>T2</th>
+                                <th>T3</th>
+                                <th>SL</th>
+                                <th>TRADE</th>
+                                <th>EXIT</th>
+                                <th>UPDATE DT</th>
+                                <!--<th>SUMMARY 30M:1H:D:W</th>-->
+                            </tr>
+                        </thead>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="https://momentjs.com/downloads/moment.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: `https://raw.githubusercontent.com/surendrakandira93/trade/main/Multiday.json?v=${(new Date()).toLocaleDateString()}`,
+                dataType: "json",
+                success: function (response) {
+                    $('#tbl_multiday').DataTable({
+                        paging: true,
+                        order: [[5, 'desc']],
+                        ajax: function (dataSent, callback, settings) {
+                            callback({ data: response.data });
+                        },
+                        columns: [
+                            {
+                                data: null,
+                                bSortable: true,
+                                visible: false,
+                                render: function (data, type, row, meta) {
+                                    return row.STRATEGY_CODE;
+                                }
+                            }
+                            ,
+                            {
+                                data: null,
+                                bSortable: false,
+                                visible: false,
+                                render: function (data, type, row, meta) {
+                                    return row.TIMEFRAME;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: true,
+                                render: function (data, type, row, meta) {
+                                    if (row.CURATED_SIGNAL == 2) {
+                                        return `<span style="width: 110px;"><a class="m-link m--font-boldest" style="color:Blue;font-weight:bold;border-radius: 16px;" id="call_symbol" href="javascript:void(0);">${row.SYMBOL}</a><a style="color:Blue;font-weight:bold;border-radius: 16px;"> ***</a></span>`;
+                                    } else {
+                                        return `<span style="width: 110px;"><a class="m-link m--font-boldest" id="call_symbol" href="javascript:void(0);">${row.SYMBOL}</a></span>`;
+                                    }
+
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    return row.LTP;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: true,
+                                render: function (data, type, row, meta) {
+                                    if (row.ALERT == 1) {
+                                        return `<span style="color:#00CC99;font-weight:bold;">LONG</span>`;
+                                    } else if (row.ALERT == -1) {
+                                        return `<span style="color:#FF0033;font-weight:bold;">SHORT</span>`;
+                                    } else {
+                                        return row.ALERT;
+                                    }
+
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: true,
+                                render: function (data, type, row, meta) {
+                                    if (type === "display") {
+                                        var date = moment(row.SIGNAL_DT);
+                                        return date.format("DD-MM-YYYY, h:mm:ss a");
+                                    }
+                                    return row.SIGNAL_DT;
+
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: true,
+                                render: function (data, type, row, meta) {
+                                    if (row.STATUS_ID == 1) {
+                                        return `<span style="width: 110px;"><span class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-primary">${row.STATUS}</span></span>`;
+                                    } else if (row.STATUS_ID == 2) {
+                                        return `<span style="width: 110px;"><span class="m-badge m-badge--danger m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-danger">${row.STATUS}</span></span>`;
+                                    } else if (row.STATUS_ID == 3 || row.STATUS_ID == 6 || row.STATUS_ID == 7) {
+                                        return `<span style="width: 110px;"><span class="m-badge m-badge--success m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-success">${row.STATUS}</span></span>`;
+                                    } else if (row.STATUS_ID == 4) {
+                                        return `<span style="width: 110px;"><span class="m-badge m-badge--dot" style="background-color:black"></span>&nbsp;<span class="m--font-bold m--font-dark">${row.STATUS}</span></span>`;
+                                    } else if (row.STATUS_ID == 5) {
+                                        return `<span style="width: 110px;"><span class="m-badge m-badge--danger m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-danger">${row.STATUS}</span></span>`;
+                                    } else {
+                                        return row.STATUS;
+                                    }
+
+
+                                }
+                            },
+
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    return row.ENTRY;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    return row.TARGET_2;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    return row.TARGET_3;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    return row.TARGET;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    return row.SL_TRAIL;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+                                    if (row.TRADES == 1) {
+                                        return `<span style="width: 110px;"><span style="color:#17a2b8;font-weight:bold;">OPEN</span></span>`;
+                                    } else {
+                                        return `<span style="width: 110px;"><span style="color:#868e96;font-weight:bold;">CLOSED</span></span>`;
+                                    }
+
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                visible: false,
+                                render: function (data, type, row, meta) {
+                                    return row.EXIT;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                render: function (data, type, row, meta) {
+
+                                    if (type === "display") {
+                                        if (row.UPDATE_DT == "0000-00-00 00:00:00") {
+                                            return '';
+                                        }
+                                        var date = moment(row.UPDATE_DT);
+                                        return date.format("DD-MM-YYYY, h:mm:ss a");
+                                    }
+                                    return row.UPDATE_DT;
+                                }
+                            },
+                            {
+                                data: null,
+                                bSortable: false,
+                                visible: false,
+                                render: function (data, type, row, meta) {
+                                    return row.UPDATE_DT;
+                                }
+                            }
+                        ]
+                    });
+                },
+                error: function () {
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
